@@ -5,11 +5,8 @@ const stopBtn   = document.getElementById("stopBtn");
 const textarea  = document.getElementById("transcript");
 
 const submitBtn = document.getElementById("submitBtn");
-const urlParams = new URLSearchParams(window.location.search);
-const pid       = urlParams.get("PROLIFIC_PID") || "local_test";
-
-const qs =new URLSearchParams(window.location.search);
-const PID = qs.get("PROLIFIC_PID") || null;
+const qs = new URLSearchParams(window.location.search);
+const PID = new URLSearchParams(location.search).get("PROLIFIC_PID");
 const STUDY = qs.get("STUDY_ID") || null;
 const SESSION = qs.get("SESSION_ID") || null;
 
@@ -64,8 +61,7 @@ submitBtn.onclick = async () => {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            text,
-            pid,
+            pid: PID,
             text,
         })
     });

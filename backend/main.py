@@ -1,4 +1,4 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Body
 from starlette.websockets import WebSocketState
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
@@ -6,8 +6,19 @@ from pathlib import Path
 import uuid
 
 from backend.whisper_api import transcribe_audio
+from backend.save_utils import append_result
 
 app = FastAPI()
+
+@app.post("/submit")
+async def submit_text(payload: dict = Body(...)):
+    """
+    payload = {"pid": "abc123", "text": "sample text"}
+    """
+    pid = payload.get("pid", "unknown")
+    text = payload.get("text", "")
+    append_result(pid, text)
+    return {"status": "saved"}
 
 # ---------------- WebSocket ----------------
 @app.websocket("/ws/audio")

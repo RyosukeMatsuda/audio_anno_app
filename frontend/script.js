@@ -4,6 +4,10 @@ const recordBtn = document.getElementById("recordBtn");
 const stopBtn   = document.getElementById("stopBtn");
 const textarea  = document.getElementById("transcript");
 
+const submitBtn = document.getElementById("submitBtn");
+const urlParams = new URLSearchParams(window.location.search);
+const pid       = urlParams.get("PROLIFIC_PID") || "local_test";
+
 recordBtn.onclick = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     mediaRecorder = new MediaRecorder(stream);
@@ -36,4 +40,30 @@ stopBtn.onclick = () => {
   mediaRecorder.stop();      // 録音停止
   socket.send("EOF");        // EOF 告知（サーバも同じ文字列を期待）
   stopBtn.disabled = true;   // 二重クリック防止
+};
+
+submitBtn.onclick = async () => {
+    const text = textarea.value;
+    if (!text) {
+        alert("テキストが空です！！");
+        return;
+    }
+
+    const res = await fetch("/submit", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            text,
+            pid,
+        })
+    });
+    
+    if(res.ok){
+        alert("テキストを送信しました．");
+        textarea.value = "";
+    }else{
+        alert("送信エラー" + res.status);
+    }
 };

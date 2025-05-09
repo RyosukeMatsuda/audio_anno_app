@@ -1,4 +1,4 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Body
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Body, Request
 from starlette.websockets import WebSocketState
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
@@ -10,6 +10,12 @@ from backend.save_utils import append_result
 from backend.save_utils import make_code
 
 app = FastAPI()
+
+@app.get("/", include_in_schema=False)
+async def root(request: Request):
+    qs = request.url.query
+    target = "/frontend/index.html" + (f"?{qs}" if qs else "")
+    return RedirectResponse(target)
 
 @app.post("/submit")
 async def submit_text(payload: dict = Body(...)):

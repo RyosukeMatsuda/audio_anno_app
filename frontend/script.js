@@ -8,6 +8,15 @@ const submitBtn = document.getElementById("submitBtn");
 const urlParams = new URLSearchParams(window.location.search);
 const pid       = urlParams.get("PROLIFIC_PID") || "local_test";
 
+const qs =new URLSearchParams(window.location.search);
+const PID = qs.get("PROLIFIC_PID") || null;
+const STUDY = qs.get("STUDY_ID") || null;
+const SESSION = qs.get("SESSION_ID") || null;
+
+if (!PID){
+    location.href = "/frontend/sorry.html";
+}
+
 recordBtn.onclick = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     mediaRecorder = new MediaRecorder(stream);
@@ -43,7 +52,7 @@ stopBtn.onclick = () => {
 };
 
 submitBtn.onclick = async () => {
-    const text = textarea.value;
+    const text = textarea.value.trim();
     if (!text) {
         alert("テキストが空です！！");
         return;
@@ -57,12 +66,13 @@ submitBtn.onclick = async () => {
         body: JSON.stringify({
             text,
             pid,
+            text,
         })
     });
     
     if(res.ok){
-        alert("テキストを送信しました．");
-        textarea.value = "";
+        const data = await res.json();
+        window.location.href =`https://app.prolific.co/submissions/complete?cc=${data.code}`;
     }else{
         alert("送信エラー" + res.status);
     }

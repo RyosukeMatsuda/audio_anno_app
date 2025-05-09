@@ -7,6 +7,7 @@ import uuid
 
 from backend.whisper_api import transcribe_audio
 from backend.save_utils import append_result
+from backend.save_utils import make_code
 
 app = FastAPI()
 
@@ -18,7 +19,8 @@ async def submit_text(payload: dict = Body(...)):
     pid = payload.get("pid", "unknown")
     text = payload.get("text", "")
     append_result(pid, text)
-    return {"status": "saved"}
+    cc = make_code(pid)
+    return {"status": "saved", "code": cc}
 
 # ---------------- WebSocket ----------------
 @app.websocket("/ws/audio")
